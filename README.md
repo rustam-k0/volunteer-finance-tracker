@@ -1,154 +1,165 @@
+### 🚀 About the Project
 
-🚀 О проекте
+**HvostatyeSosediBot** is a tool developed to simplify financial accounting for animal assistance projects. It allows for the rapid recording of **Income** (donations) and **Expenses** (pet supplies, veterinary services), minimizing manual data entry.
 
-HvostatyeSosediBot - это инструмент, разработанный для упрощения финансового учёта в волонтерских проектах по помощи животным. Он позволяет быстро и удобно фиксировать приходы (пожертвования) и расходы (покупки для питомцев, ветеринарные услуги), минимизируя ручной ввод данных.
+The bot utilizes **Google Cloud Vision OCR** technology to extract key information—including date, amount, and bank name—from photos of receipts and banking screenshots.
 
-Бот использует технологию оптического распознавания символов (OCR) Google Cloud Vision для извлечения ключевой информации с фотографий чеков и скриншотов банковских операций, включая дату, сумму и название банка.
+---
 
------
+### ✨ Core Functionality
 
-✨ Основной функционал
+* **Ingestion & OCR:** Accepts financial documents as photos, extracts text, and automatically parses the date, transaction amount, and bank.
+* **User Dialogue:** Uses inline buttons for context selection (assigning the transaction to a specific pet and classifying it as "Income" or "Expense").
+* **Manual Correction:** Displays all recognized data for user verification before saving. Users can correct any field step-by-step if the automation fails.
+* **Google Sheets Integration:** Automatically appends the validated record to a Google Sheet tab corresponding to the pet's name.
 
- * Приём и OCR-распознавание: Бот принимает финансовые документы в виде фото, извлекает из них текст и автоматически пытается распознать дату, сумму и банк.
- * Диалог с пользователем: Через удобные инлайн-кнопки пользователь указывает, к какому питомцу относится операция, и классифицирует её как "Приход" или "Расход".
- * Ручная корректировка: Перед сохранением бот выводит все распознанные и введённые данные на экран для проверки. Пользователь может пошагово исправить любое поле, если автоматика ошиблась.
- * Интеграция с Google Sheets: После финального подтверждения, запись автоматически добавляется в Google-таблицу на лист, соответствующий имени питомца.
+---
 
------
+### 🤖 Workflow Scenario
 
-🤖 Сценарий работы
-
-1. Начало работы: Пользователь отправляет боту команду `/start`.
-2. Выбор контекста: Бот запрашивает тип операции («Приход»/«Расход») и имя питомца.
-3. Отправка фото: Пользователь отправляет фотографию чека или скриншот перевода.
-4. Автоматическая обработка:
-   * Бот отправляет изображение в Google Cloud Vision.
-   * Внутренний сервис `data_parser.py` анализирует полученный текст и извлекает из него `дату`, `сумму`, `автора` и пытается определить банк.
-5. Взаимодействие с пользователем:
-   * Сценарий А (Банк найден): Если банк успешно распознан, бот сразу переходит к финальному подтверждению.
-   * Сценарий Б (Банк не найден): Если название банка не удалось извлечь, бот покажет распознанную дату/сумму и попросит пользователя выбрать банк из предложенного списка (`Сбер`, `Т-Банк`, `Другой...`).
-
-6. Финальное подтверждение: Бот показывает все собранные данные (автоматически и вручную) и предлагает их сохранить или исправить.
-
-7. Сохранение: После нажатия кнопки "Сохранить" данные отправляются в Google Sheets.
-
------
-
-📊 Структура данных
-
-Таблица Google Sheets
-
-Для каждого питомца создается отдельный лист в общей таблице.
-
-| ПРИХОД (донаты)                                
-| `Дата`, `Сумма`, `Банк`,`Автор`, `Комментарий` 
-| РАСХОД (счета) 
-| `Дата`, `Сумма`,`Процедура`,  `Автор`, `Комментарий`
-
-Переменные в коде
+1. **Initialization:** User sends `/start`.
+2. **Context Selection:** Bot requests the operation type (`Income`/`Expense`) and the Pet Name.
+3. **Image Upload:** User uploads a photo of a physical receipt or a transfer screenshot.
+4. **Automated Processing:**
+* Bot sends the image to **Google Cloud Vision**.
+* Internal service `data_parser.py` analyzes the raw text to extract `date`, `amount`, `author`, and attempts to identify the `bank`.
 
 
- * Дата: `date` (string/date)
- * Сумма: `amount` (float)
- * Банк: `bank` (string)
- * Автор: `author` (string)
- * Комментарий: `comment` (string)
- * Тип операции: `type` (string: `income`/`expense`)
- * Процудера: `procedure`
+5. **User Interaction:**
+* **Scenario A (Bank Found):** If the bank is successfully recognized, the bot proceeds directly to final confirmation.
+* **Scenario B (Bank Not Found):** If parsing fails, the bot displays the recognized date/amount and prompts the user to select a bank from a list (`Sber`, `T-Bank`, `Other...`).
 
-> #### Правила заполнения полей
->
->   * Автор (`author`):
->       * Для расхода - название клиники, магазина или контрагента (напр., "Медлаб").
->       * Для прихода - имя донатера (напр., "Денис Л.").
->   * Комментарий (`comment`):
->       * Для расхода - назначение платежа (напр., "Корм Royal Canin" или "Прививка").
->       * Для прихода - пожелание от донатера (напр., "Касперу на вкусняшки\!").
 
-Пример записи (для питомца "Каспер")
+6. **Final Confirmation:** Bot presents the aggregated data (auto-parsed + manual inputs) for review.
+7. **Save:** Upon clicking "Save", data is committed to Google Sheets.
+
+---
+
+### 📊 Data Structure
+
+#### Google Sheets Layout
+
+A separate sheet is created for each pet in the master spreadsheet.
+
+| INCOME (Donations) |  |
+| --- | --- |
+| `Date`, `Amount`, `Bank`, `Author`, `Comment` |  |
+| **EXPENSE (Bills)** |  |
+| `Date`, `Amount`, `Procedure`, `Author`, `Comment` |  |
+
+#### Code Variables
+
+* **Date:** `date` (string/date)
+* **Amount:** `amount` (float)
+* **Bank:** `bank` (string)
+* **Author:** `author` (string)
+* **Comment:** `comment` (string)
+* **Type:** `type` (string: `income` / `expense`)
+* **Procedure:** `procedure` (string)
+
+> **Field Entry Rules:**
+> * **Author (`author`):**
+> * *Expense:* Name of clinic, shop, or vendor (e.g., "MedLab").
+> * *Income:* Name of the donor (e.g., "Denis L.").
+> 
+> 
+> * **Comment (`comment`):**
+> * *Expense:* Purpose of payment (e.g., "Royal Canin Food" or "Vaccination").
+> * *Income:* Message from the donor (e.g., "Treats for Casper!").
+> 
+> 
+> 
+> 
+
+#### JSON Example (for pet "Casper")
 
 ```json
-// Запись типа "Приход"
+// Type: Income
 {
   "date": "15.01.2025",
   "amount": 500.0,
-  "bank": "Сбербанк",
-  "author": "Денис Л.",
-  "comment": "Касперу на вкусняшки!",
+  "bank": "Sberbank",
+  "author": "Denis L.",
+  "comment": "Treats for Casper!"
 }
 
-// Запись типа "Расход"
+// Type: Expense
 {
   "date": "15.01.2025",
   "amount": 1580.5,
-  "procedure": "Взятие анализов крови",
-  "author": "Медлаб",
-  "comment": "Скидка",
+  "procedure": "Blood Analysis",
+  "author": "MedLab",
+  "comment": "Discount applied"
 }
-```
-
------
-
-🛠 Технический стек
-
- * Бэкенд: Python 3.9+, FastAPI
- * Telegram API: `python-telegram-bot`
- * OCR: `google-cloud-vision`
- * Таблицы: `gspread`
- * Валидация данных: `Pydantic`
- * Хранилище: Google Sheets
- * Хостинг: Render (или любой другой)
-
------
-
-📁 Структура проекта
 
 ```
+
+---
+
+### 🛠 Tech Stack
+
+* **Backend:** Python 3.9+, FastAPI
+* **Telegram API:** `python-telegram-bot`
+* **OCR:** `google-cloud-vision`
+* **Tables:** `gspread`
+* **Validation:** `Pydantic`
+* **Storage:** Google Sheets
+* **Hosting:** Render (or similar PAAS)
+
+---
+
+### 📁 Project Structure
+
+```text
 HvostatyeSosediBot/
 ├── app/
 │   ├── bot/
-│   │   ├── handlers.py      # Логика диалогов (ConversationHandler)
-│   │   └── keyboards.py     # Инлайн-клавиатуры
+│   │   ├── handlers.py      # Dialogue logic (ConversationHandler)
+│   │   └── keyboards.py     # Inline keyboards
 │   ├── services/
-│   │   ├── vision_ocr.py    # Клиент для Google Cloud Vision
-│   │   ├── sheets_client.py # Клиент для Google Sheets
-│   │   └── data_parser.py   # Извлечение данных из текста
+│   │   ├── vision_ocr.py    # Google Cloud Vision client
+│   │   ├── sheets_client.py # Google Sheets client
+│   │   └── data_parser.py   # Text extraction logic
 │   └── models/
-│       └── schemas.py       # Pydantic-схемы данных
+│       └── schemas.py       # Pydantic data schemas
 ├── config/
-│   └── settings.py          # Настройки и переменные окружения
-├── requirements.txt         # Зависимости проекта
-└── main.py                  # Точка входа FastAPI-приложения
-└── credentials.json
-└── .env
+│   └── settings.py          # Configuration and Environment variables
+├── requirements.txt         # Project dependencies
+├── main.py                  # FastAPI entry point
+├── credentials.json         # Google Service Account Key
+└── .env                     # Environment variables file
+
 ```
 
------
+---
 
-⚙️ Установка и запуск
+### ⚙️ Installation & Run
 
-1. Клонируйте репозиторий:
+1. **Clone the repository:**
+```bash
+git clone [your_repo_url]
+cd HvostatyeSosediBot
 
-    ```bash
-    git clone [адрес вашего репозитория]
-    cd HvostatyeSosediBot
-    ```
+```
 
-2. Создайте и активируйте виртуальное окружение:
 
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
+2. **Create and activate virtual environment:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
 
-3. Установите зависимости:
+```
 
-    ```bash
-    pip install -r requirements.txt
-    ```
 
-4. Запустите приложение:
+3. **Install dependencies:**
+```bash
+pip install -r requirements.txt
 
-    ```bash
-    uvicorn main:app --reload
-    ```
+```
+
+
+4. **Run the application:**
+```bash
+uvicorn main:app --reload
+
+```
