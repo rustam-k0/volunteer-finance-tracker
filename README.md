@@ -4,6 +4,14 @@
 
 The bot utilizes **Google Cloud Vision OCR** technology to extract key information—including date, amount, and bank name—from photos of receipts and banking screenshots.
 
+Because the product is primarily used in Telegram on mobile devices, the README highlights the real mobile-first flow below.
+
+<p align="center">
+  <img src="docs/images/mobile-start.jpg" alt="Telegram bot start screen with operation type buttons on mobile" width="320" />
+</p>
+
+<p align="center"><em>Start screen: the user opens the bot in Telegram and immediately chooses the type of financial operation.</em></p>
+
 ---
 
 ### ✨ Core Functionality
@@ -32,6 +40,12 @@ The bot utilizes **Google Cloud Vision OCR** technology to extract key informati
 
 6. **Final Confirmation:** Bot presents the aggregated data (auto-parsed + manual inputs) for review.
 7. **Save:** Upon clicking "Save", data is committed to Google Sheets.
+
+<p align="center">
+  <img src="docs/images/mobile-ocr-confirmation.jpg" alt="Telegram bot on mobile showing OCR results and confirmation buttons" width="320" />
+</p>
+
+<p align="center"><em>OCR confirmation step: the bot extracts the key fields, shows them to the user, and lets them save or correct the record before it reaches Google Sheets.</em></p>
 
 ---
 
